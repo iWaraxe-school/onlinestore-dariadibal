@@ -18,11 +18,11 @@ public class StoreApp {
             switch (scanner.nextLine()) {
                 case "sort":
                     System.out.println("Sorted list:");
-                    // todo sort
+                    onlineStore.printSorted();
                     break;
                 case "top":
                     System.out.println("Top 5: ");
-                    // todo print top 5
+                    onlineStore.printTop5();
                     break;
                 case "quit":
                     scanner.close();
