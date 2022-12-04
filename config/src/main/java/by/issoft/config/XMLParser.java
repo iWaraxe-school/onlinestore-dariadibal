@@ -19,7 +19,7 @@ public class XMLParser {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = builder.parse(new File("config/config.xml"));
+            Document document = builder.parse(new File("config/src/main/resources/config.xml"));
             document.normalize();
             NodeList nList = document.getElementsByTagName("sort").item(0).getChildNodes();
             for (int i = 0; i < nList.getLength(); i++) {

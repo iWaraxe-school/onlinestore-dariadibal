@@ -1,7 +1,9 @@
 package by.issoft.helper;
 
 
-import by.issoft.*;
+import by.issoft.domain.Category;
+import by.issoft.domain.Product;
+import by.issoft.store.Store;
 import org.reflections.Reflections;
 
 import java.lang.reflect.InvocationTargetException;
@@ -36,7 +38,7 @@ public class StoreHelper {
     private static Map<Category, Integer> createCategoryMap() {
         Map<Category, Integer> categoryToPut = new HashMap<>();
 
-        Reflections reflections = new Reflections("by.issoft.categories");
+        Reflections reflections = new Reflections("by.issoft.domain.categories");
 
         Set<Class<? extends Category>> subTypes = reflections.getSubTypesOf(Category.class);
 

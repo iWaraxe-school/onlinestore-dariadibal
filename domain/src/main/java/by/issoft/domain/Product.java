@@ -1,4 +1,4 @@
-package by.issoft;
+package by.issoft.domain;
 
 public class Product {
     private String name;
@@ -9,6 +9,18 @@ public class Product {
         this.name = name;
         this.price = price;
         this.rate = rate;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public Double getRate() {
+        return rate;
     }
 
     @Override
