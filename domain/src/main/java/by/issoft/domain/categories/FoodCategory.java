@@ -1,6 +1,6 @@
-package by.issoft.categories;
+package by.issoft.domain.categories;
 
-import by.issoft.Category;
+import by.issoft.domain.Category;
 
 public class FoodCategory extends Category {
 

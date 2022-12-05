@@ -1,4 +1,4 @@
-package by.issoft;
+package by.issoft.domain;
 
 
 import java.util.ArrayList;
@@ -15,6 +15,10 @@ public class Category {
 
     public String getName() {
         return name;
+    }
+
+    public List<Product> getProductList() {
+        return productList;
     }
 
     public void addProductToCategory(Product product) {
