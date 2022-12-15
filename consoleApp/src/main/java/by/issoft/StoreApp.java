@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 public class StoreApp {
     public static void main(String[] args) {
-        Store onlineStore = new Store();
+        Store onlineStore = Store.getInstance();
         StoreHelper storeHelper = new StoreHelper(onlineStore);
         storeHelper.fillStoreRandomly();
         onlineStore.printAllCategoriesAndProducts();
