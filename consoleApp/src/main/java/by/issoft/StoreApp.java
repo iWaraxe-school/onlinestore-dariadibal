@@ -3,10 +3,11 @@ package by.issoft;
 import by.issoft.helper.StoreHelper;
 import by.issoft.store.Store;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Scanner;
 
 public class StoreApp {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         Store onlineStore = Store.getInstance();
         StoreHelper storeHelper = new StoreHelper(onlineStore);
         storeHelper.fillStoreRandomly();
