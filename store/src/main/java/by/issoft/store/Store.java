@@ -10,6 +10,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Store {
+    private static Store instance;
+    private Store(){}
+    public static Store getInstance(){
+        if(instance == null) {
+            instance = new Store();
+        }
+        return instance;
+    }
     private List<Category> categoryList = new ArrayList<>();
 
     public void addCategory(Category category) {
