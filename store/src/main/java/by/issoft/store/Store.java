@@ -4,21 +4,22 @@ import by.issoft.domain.Category;
 import by.issoft.domain.Product;
 import by.issoft.domain.ProductComparator;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Store {
     private static Store instance;
     private Store(){}
+
     public static Store getInstance(){
         if(instance == null) {
             instance = new Store();
         }
         return instance;
     }
+
     private List<Category> categoryList = new ArrayList<>();
+    private Collection<Product> purchased =  Collections.synchronizedCollection(new ArrayList<>());
 
     public void addCategory(Category category) {
         categoryList.add(category);
@@ -30,7 +31,7 @@ public class Store {
         }
     }
 
-    private List<Product> getListOfProducts() {
+    public List<Product> getListOfProducts() {
         return categoryList.stream()
                 .map(Category::getProductList)
                 .flatMap(Collection::stream)
@@ -48,5 +49,15 @@ public class Store {
                 .sorted(ProductComparator.top5Comparator)
                 .limit(5)
                 .forEach(System.out::println);
+    }
+
+    public void addPurchasedProduct(Product product) {
+        this.purchased.add(product);
+        System.out.println("Number of purchases: " + purchased.size());
+    }
+
+    public void cleanPurchased() {
+        this.purchased.clear();
+        System.out.println("Purchase is cleared");
     }
 }
