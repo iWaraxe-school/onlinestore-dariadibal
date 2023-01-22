@@ -25,15 +25,18 @@ public class StoreHelper {
         Map<Category, Integer> categoryMap = createCategoryMap();
 
         for (Map.Entry<Category, Integer> entry : categoryMap.entrySet()) {
+            // insert into DB category (entry.key)
             for (int i = 0; i < entry.getValue(); i++) {
+                // insert products into DB
                 GeneralProductBuilder builder = new GeneralProductBuilder();
                 Product newproduct = builder.name(populator.getProductName(entry.getKey().getName()))
                         .price(populator.getPrice())
                         .rate(populator.getRate())
                         .build();
-
+                // Not relevant
                 entry.getKey().addProductToCategory(newproduct);
             }
+            // Not relevant
             this.store.addCategory(entry.getKey());
         }
     }
