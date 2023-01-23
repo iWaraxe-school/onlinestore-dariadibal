@@ -1,5 +1,6 @@
 package by.issoft;
 
+import by.issoft.helper.DBHelper;
 import by.issoft.helper.StoreHelper;
 import by.issoft.store.OrderCreationExecutor;
 import by.issoft.store.Store;
@@ -16,6 +17,15 @@ public class StoreApp {
         StoreHelper storeHelper = new StoreHelper(onlineStore);
         storeHelper.fillStoreRandomly();
         onlineStore.printAllCategoriesAndProducts();
+
+        DBHelper dbHelper = new DBHelper();
+        dbHelper.connectToDb();
+        dbHelper.clearDB();
+        dbHelper.createCategoryTable();
+        dbHelper.createProductTable();
+        dbHelper.fillStoreRandomly();
+        dbHelper.printFilledStore();
+
 
         ExecutorService executor = Executors.newFixedThreadPool(10);
 
