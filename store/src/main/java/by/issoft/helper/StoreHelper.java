@@ -2,56 +2,38 @@ package by.issoft.helper;
 
 
 import by.issoft.domain.Category;
-import by.issoft.domain.GeneralProductBuilder;
 import by.issoft.domain.Product;
 import by.issoft.store.Store;
-import org.reflections.Reflections;
+import lombok.SneakyThrows;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StoreHelper {
-    Store store;
+    Store store = Store.getInstance();
+    DB db = DB.getInstance();
 
-    public StoreHelper(Store store) {
-        this.store = store;
-    }
+    @SneakyThrows
+    public void fillStore () {
+        ResultSet RESULTSET = db.execute("SELECT * FROM CATEGORIES");
+        List<Category> categories = new ArrayList<>();
+        while (RESULTSET.next()) {
+            categories.add(new Category(RESULTSET.getString("NAME")));
+        }
 
-    public void fillStoreRandomly() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        RandomStorePopulator populator = new RandomStorePopulator();
-        Map<Category, Integer> categoryMap = createCategoryMap();
-
-        for (Map.Entry<Category, Integer> entry : categoryMap.entrySet()) {
-            // insert into DB category (entry.key)
-            for (int i = 0; i < entry.getValue(); i++) {
-                // insert products into DB
-                GeneralProductBuilder builder = new GeneralProductBuilder();
-                Product newproduct = builder.name(populator.getProductName(entry.getKey().getName()))
-                        .price(populator.getPrice())
-                        .rate(populator.getRate())
-                        .build();
-                // Not relevant
-                entry.getKey().addProductToCategory(newproduct);
+        for (Category category: categories) {
+            RESULTSET = db.execute("SELECT PRODUCTS.NAME, PRODUCTS.RATE, PRODUCTS.PRICE FROM PRODUCTS INNER JOIN CATEGORIES " +
+                    "ON PRODUCTS.CATEGORY_ID=CATEGORIES.ID AND CATEGORIES.NAME ='"+ category.getName() +"'");
+            while (RESULTSET.next()) {
+                category.addProductToCategory(new Product(RESULTSET.getString("NAME"),
+                        RESULTSET.getDouble("RATE"),
+                        RESULTSET.getDouble("PRICE")));
             }
-            // Not relevant
-            this.store.addCategory(entry.getKey());
         }
-    }
 
-    private static Map<Category, Integer> createCategoryMap() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        Map<Category, Integer> categoryToPut = new HashMap<>();
-
-        Reflections reflections = new Reflections("by.issoft.domain.categories");
-
-        Set<Class<? extends Category>> subTypes = reflections.getSubTypesOf(Category.class);
-
-        for (Class<? extends Category> type : subTypes) {
-            Random random = new Random();
-            categoryToPut.put( CategoryFactory.getCategory(type), random.nextInt(10));
+        for (Category category: categories) {
+            store.addCategory(category);
         }
-        return categoryToPut;
-    }
+   }
 }

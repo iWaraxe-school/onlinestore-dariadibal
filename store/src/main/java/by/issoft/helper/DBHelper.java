@@ -1,8 +1,6 @@
 package by.issoft.helper;
 
 import by.issoft.domain.Category;
-import by.issoft.domain.GeneralProductBuilder;
-import by.issoft.domain.Product;
 import lombok.SneakyThrows;
 import org.reflections.Reflections;
 
@@ -14,59 +12,18 @@ import java.util.Random;
 import java.util.Set;
 
 public class DBHelper {
-    static Connection CONNECTION = null;
-    static Statement STATEMENT = null;
-    static Statement STATEMENT_ENCLOSED = null;
     static ResultSet RESULTSET = null;
-    static ResultSet RESULTSET_ENCLOSED = null;
+    private DB db = DB.getInstance();
 
-    static final String URL = "jdbc:h2:mem:testdb";
-    static final String USERNAME = "student";
-    static final String PASSWORD = "student";
-
-    @SneakyThrows
-    public void connectToDb() {
-        try {
-            CONNECTION = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            System.out.println("\nDatabase connection successfull!\n");
-            STATEMENT = CONNECTION.createStatement();
-            STATEMENT_ENCLOSED = CONNECTION.createStatement();
-        } catch (SQLDataException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void clearDB(){
-        String query1 = "DROP TABLE IF EXISTS CATEGORIES";
-        String query2 = "DROP TABLE IF EXISTS PRODUCT";
-        try {
-            STATEMENT.executeUpdate(query1);
-            System.out.println("categories dropped");
-            STATEMENT.executeUpdate(query2);
-            System.out.println("products dropped");
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
     public void createCategoryTable(){
         String query = "CREATE TABLE IF NOT EXISTS CATEGORIES(ID INT PRIMARY KEY AUTO_INCREMENT NOT NULL, NAME VARCHAR(255) NOT NULL);";
-        try {
-            STATEMENT.executeUpdate(query);
-            System.out.println("category table created");
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        db.create(query);
     }
     public void createProductTable(){
         String query = "CREATE TABLE IF NOT EXISTS PRODUCTS(ID INT PRIMARY KEY AUTO_INCREMENT NOT NULL," +
                 "CATEGORY_ID INT NOT NULL, NAME VARCHAR(255) NOT NULL, RATE DECIMAL (10, 1) NOT NULL, " +
                 "PRICE DECIMAL (10, 1) NOT NULL, FOREIGN KEY(CATEGORY_ID) REFERENCES CATEGORIES(ID));";
-        try {
-            STATEMENT.executeUpdate(query);
-            System.out.println("product table created");
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        db.create(query);
     }
 
     public void fillStoreRandomly() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
@@ -80,32 +37,24 @@ public class DBHelper {
         }
     }
 
+    @SneakyThrows
     private void addCategoryToDB(Category category) {
-        try {
-            PreparedStatement insertCategories = CONNECTION.prepareStatement("INSERT INTO CATEGORIES(NAME)"
-                    + " VALUES (?)");
-            insertCategories.setString(1, category.getName());
-            System.out.println(insertCategories);
-            insertCategories.execute();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        PreparedStatement insertCategories = DB.CONNECTION.prepareStatement("INSERT INTO CATEGORIES(NAME)"
+                + " VALUES (?)");
+        insertCategories.setString(1, category.getName());
+        db.execute(insertCategories);
     }
 
-    private void addProductToDB(Map.Entry<Category, Integer> entry,RandomStorePopulator populator, int categoryID ){
+    @SneakyThrows
+    private void addProductToDB(Map.Entry<Category, Integer> entry, RandomStorePopulator populator, int categoryID ){
         for (int i = 0; i < entry.getValue(); i++) {
-            try {
-                PreparedStatement insertProducts = CONNECTION.prepareStatement("INSERT INTO PRODUCTS (CATEGORY_ID,NAME,RATE,PRICE)"
-                        + "VALUES (?,?,?,?)");
-                insertProducts.setInt (1, categoryID);
-                insertProducts.setString (2,populator.getProductName(entry.getKey().getName()));
-                insertProducts.setDouble (3,populator.getRate());
-                insertProducts.setDouble (4,populator.getPrice());
-                System.out.println(insertProducts);
-                insertProducts.execute();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+            PreparedStatement insertProducts = DB.CONNECTION.prepareStatement("INSERT INTO PRODUCTS (CATEGORY_ID,NAME,RATE,PRICE)"
+                    + "VALUES (?,?,?,?)");
+            insertProducts.setInt (1, categoryID);
+            insertProducts.setString (2,populator.getProductName(entry.getKey().getName()));
+            insertProducts.setDouble (3,populator.getRate());
+            insertProducts.setDouble (4,populator.getPrice());
+            db.execute(insertProducts);
         }
     }
 
@@ -122,11 +71,12 @@ public class DBHelper {
         }
         return categoryToPut;
     }
+
     @SneakyThrows
     public void printFilledStore() {
         try {
             System.out.println("\nPrint Store from DataBase\n");
-            RESULTSET = STATEMENT.executeQuery("SELECT * FROM CATEGORIES");
+            RESULTSET = db.execute("SELECT * FROM CATEGORIES");
             System.out.println("List of Categories");
             while (RESULTSET.next()) {
                 System.out.println(
@@ -134,7 +84,7 @@ public class DBHelper {
                                 RESULTSET.getString("NAME"));
 
             }
-            RESULTSET = STATEMENT.executeQuery("SELECT * FROM PRODUCTS");
+            RESULTSET = db.execute("SELECT * FROM PRODUCTS");
             System.out.println("List of Products");
             while (RESULTSET.next()) {
                 System.out.println(
