@@ -11,7 +11,7 @@ import java.util.Random;
 import static java.util.concurrent.TimeUnit.*;
 
 public class OrderCreationExecutor implements Runnable {
-    private Store store;
+    private Store store = Store.getInstance();
 
     @SneakyThrows
     @Override
@@ -31,8 +31,4 @@ public class OrderCreationExecutor implements Runnable {
         store.addPurchasedProduct(randomProduct);
         System.out.println("OrderCreationExecutor ended");
     }
-    public void setStore (Store store) {
-        this.store = store;
-    }
-
 }

@@ -3,7 +3,6 @@ package by.issoft.store;
 import by.issoft.domain.Category;
 import by.issoft.domain.Product;
 import by.issoft.domain.ProductComparator;
-import com.sun.jdi.connect.spi.Connection;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -30,6 +29,15 @@ public class Store {
         for (Category category : categoryList) {
             category.printAllProducts();
         }
+    }
+
+    public String categoryNames() {
+        String name = "";
+        for (Category category: categoryList
+             ) {
+            name += category.getName() + " ";
+        }
+        return name;
     }
 
     public List<Product> getListOfProducts() {

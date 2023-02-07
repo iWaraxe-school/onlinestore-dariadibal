@@ -1,10 +1,12 @@
 package by.issoft;
 
+import by.issoft.helper.DB;
 import by.issoft.helper.DBHelper;
 import by.issoft.helper.StoreHelper;
+import by.issoft.server.Client;
+import by.issoft.server.Server;
 import by.issoft.store.OrderCreationExecutor;
 import by.issoft.store.Store;
-import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Scanner;
@@ -13,19 +15,20 @@ import java.util.concurrent.*;
 
 public class StoreApp {
     public static void main(String[] args) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, InterruptedException, ExecutionException {
-        Store onlineStore = Store.getInstance();
-        StoreHelper storeHelper = new StoreHelper(onlineStore);
-        storeHelper.fillStoreRandomly();
-        onlineStore.printAllCategoriesAndProducts();
+        DB db = DB.getInstance();
+        db.connectToDb();
+        db.clearDB();
 
         DBHelper dbHelper = new DBHelper();
-        dbHelper.connectToDb();
-        dbHelper.clearDB();
         dbHelper.createCategoryTable();
         dbHelper.createProductTable();
         dbHelper.fillStoreRandomly();
         dbHelper.printFilledStore();
 
+        Store onlineStore = Store.getInstance();
+        StoreHelper storeHelper = new StoreHelper();
+        storeHelper.fillStore();
+        onlineStore.printAllCategoriesAndProducts();
 
         ExecutorService executor = Executors.newFixedThreadPool(10);
 
@@ -34,9 +37,16 @@ public class StoreApp {
             onlineStore.cleanPurchased();
         }, 0, 2, TimeUnit.MINUTES);
 
+        Server server = new Server();
+        server.createServer();
+
+        Client client = new Client();
+        client.printCategory();
+        client.addToCart();
+
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.println("Please use the following commands to interact with the store: sort, top, quit.");
+            System.out.println("Please use the following commands to interact with the store: sort, top, order, quit.");
 
             switch (scanner.nextLine()) {
                 case "sort":
@@ -49,7 +59,6 @@ public class StoreApp {
                     break;
                 case "order":
                     OrderCreationExecutor oce = new OrderCreationExecutor();
-                    oce.setStore(onlineStore);
                     executor.submit(oce);
                     System.out.println("Order Created");
                     break;
